@@ -1,5 +1,5 @@
-#ifndef FusionEKF_H_
-#define FusionEKF_H_
+#ifndef EXTENDED_KF_FusionEKF_H_
+#define EXTENDED_KF_FusionEKF_H_
 
 #include "measurement_package.h"
 #include "Eigen/Dense"
@@ -44,6 +44,16 @@ private:
   Eigen::MatrixXd R_radar_;
   Eigen::MatrixXd H_laser_;
   Eigen::MatrixXd Hj_;
+
+  /**
+   * Copy constructor
+   */
+  FusionEKF(const FusionEKF&);
+
+  /**
+   * Copy operator
+   */
+  FusionEKF& operator=(const FusionEKF&);
 };
 
-#endif /* FusionEKF_H_ */
+#endif /* EXTENDED_KF_FusionEKF_H_ */

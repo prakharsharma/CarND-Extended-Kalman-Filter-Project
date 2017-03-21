@@ -1,5 +1,5 @@
-#ifndef KALMAN_FILTER_H_
-#define KALMAN_FILTER_H_
+#ifndef EXTENDED_KF_KALMAN_FILTER_H_
+#define EXTENDED_KF_KALMAN_FILTER_H_
 #include "Eigen/Dense"
 
 class KalmanFilter {
@@ -64,6 +64,16 @@ public:
    */
   void UpdateEKF(const Eigen::VectorXd &z);
 
+private:
+  /**
+   * Copy constructor
+   */
+  KalmanFilter(const KalmanFilter&);
+
+  /**
+   * Copy operator
+   */
+  KalmanFilter& operator=(const KalmanFilter&);
 };
 
-#endif /* KALMAN_FILTER_H_ */
+#endif /* EXTENDED_KF_KALMAN_FILTER_H_ */

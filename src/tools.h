@@ -1,5 +1,5 @@
-#ifndef TOOLS_H_
-#define TOOLS_H_
+#ifndef EXTENDED_KF_TOOLS_H_
+#define EXTENDED_KF_TOOLS_H_
 #include <vector>
 #include "Eigen/Dense"
 
@@ -18,13 +18,26 @@ public:
   /**
   * A helper method to calculate RMSE.
   */
-  Eigen::VectorXd CalculateRMSE(const std::vector<Eigen::VectorXd> &estimations, const std::vector<Eigen::VectorXd> &ground_truth);
+  Eigen::VectorXd CalculateRMSE(
+      const std::vector<Eigen::VectorXd> &estimations,
+      const std::vector<Eigen::VectorXd> &ground_truth
+  );
 
   /**
   * A helper method to calculate Jacobians.
   */
   Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
 
+private:
+  /**
+   * Copy constructor
+   */
+  Tools(const Tools&);
+
+  /**
+   * Copy operator
+   */
+  Tools& operator=(const Tools&);
 };
 
-#endif /* TOOLS_H_ */
+#endif /* EXTENDED_KF_TOOLS_H_ */
