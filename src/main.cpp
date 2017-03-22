@@ -79,42 +79,33 @@ int main(int argc, char* argv[]) {
     // reads first element from the current line
     iss >> sensor_type;
     if (sensor_type.compare("L") == 0) {
-      // LASER MEASUREMENT
-
-      // read measurements at this timestamp
       meas_package.sensor_type_ = MeasurementPackage::LASER;
+
       meas_package.raw_measurements_ = VectorXd(2);
-      float x;
-      float y;
+      double x, y;
       iss >> x;
       iss >> y;
       meas_package.raw_measurements_ << x, y;
+
       iss >> timestamp;
       meas_package.timestamp_ = timestamp;
-      measurement_pack_list.push_back(meas_package);
     } else if (sensor_type.compare("R") == 0) {
-      // RADAR MEASUREMENT
-
-      // read measurements at this timestamp
       meas_package.sensor_type_ = MeasurementPackage::RADAR;
+
       meas_package.raw_measurements_ = VectorXd(3);
-      float ro;
-      float phi;
-      float ro_dot;
+      double ro, phi, ro_dot;
       iss >> ro;
       iss >> phi;
       iss >> ro_dot;
       meas_package.raw_measurements_ << ro, phi, ro_dot;
+
       iss >> timestamp;
       meas_package.timestamp_ = timestamp;
-      measurement_pack_list.push_back(meas_package);
     }
+    measurement_pack_list.push_back(meas_package);
 
     // read ground truth data to compare later
-    float x_gt;
-    float y_gt;
-    float vx_gt;
-    float vy_gt;
+    double x_gt, y_gt, vx_gt, vy_gt;
     iss >> x_gt;
     iss >> y_gt;
     iss >> vx_gt;
@@ -124,18 +115,13 @@ int main(int argc, char* argv[]) {
     gt_pack_list.push_back(gt_package);
   }
 
-  // Create a Fusion EKF instance
   FusionEKF fusionEKF;
 
-  // used to compute the RMSE later
   vector<VectorXd> estimations;
   vector<VectorXd> ground_truth;
 
-  //Call the EKF-based fusion
   size_t N = measurement_pack_list.size();
   for (size_t k = 0; k < N; ++k) {
-    // start filtering from the second frame (the speed is unknown in the first
-    // frame)
     fusionEKF.ProcessMeasurement(measurement_pack_list[k]);
 
     // output the estimation
@@ -149,12 +135,13 @@ int main(int argc, char* argv[]) {
       // output the estimation
       out_file_ << measurement_pack_list[k].raw_measurements_(0) << "\t";
       out_file_ << measurement_pack_list[k].raw_measurements_(1) << "\t";
-    } else if (measurement_pack_list[k].sensor_type_ == MeasurementPackage::RADAR) {
+    } else if (measurement_pack_list[k].sensor_type_ ==
+        MeasurementPackage::RADAR) {
       // output the estimation in the cartesian coordinates
       float ro = measurement_pack_list[k].raw_measurements_(0);
       float phi = measurement_pack_list[k].raw_measurements_(1);
-      out_file_ << ro * cos(phi) << "\t"; // p1_meas
-      out_file_ << ro * sin(phi) << "\t"; // ps_meas
+      out_file_ << ro * cos(phi) << "\t";
+      out_file_ << ro * sin(phi) << "\t";
     }
 
     // output the ground truth packages

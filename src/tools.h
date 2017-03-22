@@ -1,5 +1,6 @@
 #ifndef EXTENDED_KF_TOOLS_H_
 #define EXTENDED_KF_TOOLS_H_
+
 #include <vector>
 #include "Eigen/Dense"
 
@@ -26,7 +27,7 @@ public:
   /**
   * A helper method to calculate Jacobians.
   */
-  Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
+//  Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
 
 private:
   /**
