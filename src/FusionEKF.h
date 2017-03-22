@@ -41,8 +41,11 @@ private:
   // tool object used to compute Jacobian and RMSE
   Tools tools;
 
-  float noise_ax;
-  float noise_ay;
+  double noise_ax;
+  double noise_ay;
+
+  void ProcessFirstMeasurement(const MeasurementPackage&);
+  void ProcessSubsequentMeasurement(const MeasurementPackage&);
 
   /**
    * Copy constructor

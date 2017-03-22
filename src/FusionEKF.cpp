@@ -66,47 +66,53 @@ FusionEKF::~FusionEKF() {}
 
 void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
-
-  /*****************************************************************************
-   *  Initialization
-   ****************************************************************************/
-  if (!is_initialized_) {
-    // first measurement
-    cout << "EKF: " << endl;
-
-    if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-      /**
-      Convert radar from polar to cartesian coordinates and initialize state.
-      */
-      double range = measurement_pack.raw_measurements_(0);
-      double bearing = measurement_pack.raw_measurements_(1);
-      double range_rate = measurement_pack.raw_measurements_(2);
-      double cosine = cos(bearing);
-      double sine = sin(bearing);
-
-      ekf_.x_ << range * cosine, range * sine,
-          range_rate * cosine, range_rate * sine;
-    }
-    else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
-      // TODO: is initializing velocity to zero okay?
-      ekf_.x_ << measurement_pack.raw_measurements_(0),
-          measurement_pack.raw_measurements_(1), 0, 0;
-    }
-
-    // done initializing, no need to predict or update
-    is_initialized_ = true;
-    previous_timestamp_ = measurement_pack.timestamp_;
-
-    return;
+  cout << "######################################" << endl;
+  if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
+    cout << "Radar measurement" << endl;
+  } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
+    cout << "Laser measurement" << endl;
   }
 
+  if (!is_initialized_) {
+    ProcessFirstMeasurement(measurement_pack);
+    is_initialized_ = true;
+  } else {
+    ProcessSubsequentMeasurement(measurement_pack);
+  }
+
+  previous_timestamp_ = measurement_pack.timestamp_;
+
+  // print the output
+  cout << "x_ = " << ekf_.x_ << endl;
+  cout << "P_ = " << ekf_.P_ << endl;
+  cout << endl;
+}
+
+void FusionEKF::ProcessFirstMeasurement(
+    const MeasurementPackage &measurement_pack) {
+
+  if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
+    double range = measurement_pack.raw_measurements_(0);
+    double bearing = measurement_pack.raw_measurements_(1);
+    double range_rate = measurement_pack.raw_measurements_(2);
+    double cosine = cos(bearing);
+    double sine = sin(bearing);
+
+    ekf_.x_ << range * cosine, range * sine,
+        range_rate * cosine, range_rate * sine;
+  } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
+    ekf_.x_ << measurement_pack.raw_measurements_(0),
+        measurement_pack.raw_measurements_(1), 0, 0;
+  }
+}
+
+void FusionEKF::ProcessSubsequentMeasurement(
+    const MeasurementPackage &measurement_pack) {
   /*****************************************************************************
    *  Prediction
    ****************************************************************************/
 
   double dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0;
-  previous_timestamp_ = measurement_pack.timestamp_;
-
   double dt2 = dt * dt;
   double dt3 = dt2 * dt;
   double dt4 = dt3 * dt;
@@ -122,18 +128,18 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       0, dt3 * noise_ay/2, 0, dt2 * noise_ay;
 
   ekf_.Predict();
+//  cout << "done with prediction update" << endl;
 
   /*****************************************************************************
    *  Update
    ****************************************************************************/
 
+//  cout << "measurement: " << measurement_pack.raw_measurements_ << endl;
+
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
-  } else {
+  } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
     ekf_.Update(measurement_pack.raw_measurements_);
   }
-
-  // print the output
-  cout << "x_ = " << ekf_.x_ << endl;
-  cout << "P_ = " << ekf_.P_ << endl;
+//  cout << "done with measurement update" << endl;
 }

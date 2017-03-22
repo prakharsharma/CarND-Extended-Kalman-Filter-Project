@@ -24,11 +24,6 @@ public:
       const std::vector<Eigen::VectorXd> &ground_truth
   );
 
-  /**
-  * A helper method to calculate Jacobians.
-  */
-//  Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
-
 private:
   /**
    * Copy constructor
